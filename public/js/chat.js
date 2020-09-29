@@ -62,36 +62,14 @@ socket.on('message', (message) => {
 })
 
 socket.on('locationMessage', (message) => {
-    console.log(message.url)
+    console.log(message)
     const html = Mustache.render(locationTemplate, {
         username: message.username,
-        message: message.url,
+        url: message.url,
         createdAt: moment(message.createdAt).format('HH:mm ddd')
     })
     $messages.insertAdjacentHTML('beforeend', html)
     autoscroll()
-})
-
-$messageForm.addEventListener('submit', (e) => {
-    e.preventDefault()
-
-    // disables messages after sending.
-    $messageFormButton.setAttribute('disabled', 'disabled')
-
-    const message = e.target.elements.message.value
-
-    socket.emit('sendMessage', message, (error) => {
-        //enables messages after sendMessage.
-        $messageFormButton.removeAttribute('disabled')
-        //removes text from input after sendt.
-        $messageFormInput.value = ''
-        $messageFormInput.focus()
-
-        if (error) {
-            return console.log(error)
-        }
-        console.log('Message delivered!')
-    })
 })
 
     socket.on('roomData', ({ room, users }) => {
@@ -100,6 +78,28 @@ $messageForm.addEventListener('submit', (e) => {
             users
         })
         document.querySelector('#sidebar').innerHTML = html
+    })
+
+    $messageForm.addEventListener('submit', (e) => {
+        e.preventDefault()
+    
+        // disables messages after sending.
+        $messageFormButton.setAttribute('disabled', 'disabled')
+    
+        const message = e.target.elements.message.value
+    
+        socket.emit('sendMessage', message, (error) => {
+            //enables messages after sendMessage.
+            $messageFormButton.removeAttribute('disabled')
+            //removes text from input after sendt.
+            $messageFormInput.value = ''
+            $messageFormInput.focus()
+    
+            if (error) {
+                return console.log(error)
+            }
+            console.log('Message delivered!')
+        })
     })
 
 $sendLocation.addEventListener('click', () => {
